@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Vente de Voitures</title>
+</head>
+<body style="font-family: sans-serif; padding: 20px; background-color: #f4f4f4;">
+    <h1>🚗 Notre Catalogue de Voitures</h1>
+    <hr>
+
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px;">
+        {% for car in cars %}
+            <div style="border: 1px solid #ddd; padding: 0; border-radius: 12px; width: 300px; background: white; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
+                {% if car.image %}
+                    <img src="{{ car.image.url }}" alt="{{ car.brand }}" style="width: 100%; height: 200px; object-fit: cover;">
+                {% else %}
+                    <div style="width: 100%; height: 200px; background: #eee; display: flex; align-items: center; justify-content: center; color: #888;">
+                        Pas de photo disponible
+                    </div>
+                {% endif %}
+
+                <div style="padding: 15px;">
+                    <h2 style="margin: 0; color: #2c3e50;">{{ car.brand }} {{ car.model }}</h2>
+                    <p style="color: #666; margin: 10px 0;">Année : {{ car.year }}</p>
+                    <p style="font-size: 1.3em; color: #e74c3c; font-weight: bold;">{{ car.price }} €</p>
+                    <p style="font-style: italic; font-size: 0.9em;">{{ car.description }}</p>
+                </div>
+            </div>
+        {% empty %}
+            <p>Désolé, aucune voiture n'est disponible pour le moment.</p>
+        {% endfor %}
+    </div>
+</body>
+</html>

@@ -10,6 +10,6 @@ class Car(models.Model):
     year = models.IntegerField(verbose_name="Année")
     description = models.TextField(blank=True, verbose_name="Description")
     created_at = models.DateTimeField(auto_now_add=True)
-
+    image = models.ImageField(upload_to='cars/', blank=True, null=True, verbose_name="Photo")
     def __str__(self):
         return f"{self.brand} {self.model} ({self.year})"
