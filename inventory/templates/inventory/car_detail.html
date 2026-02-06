@@ -1,0 +1,42 @@
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ car.brand }} {{ car.model }} - Détails</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <a href="{% url 'home' %}" class="btn btn-outline-secondary mb-3">← Retour au catalogue</a>
+
+    <div class="row bg-white shadow rounded overflow-hidden">
+        <div class="col-md-6 p-0">
+            {% if car.image %}
+                <img src="{{ car.image.url }}" class="w-100 h-100" style="object-fit: cover; min-height: 400px;" alt="{{ car.brand }}">
+            {% else %}
+                <img src="https://via.placeholder.com/600x400" class="w-100">
+            {% endif %}
+        </div>
+
+        <div class="col-md-6 p-5">
+            <h1 class="display-5 fw-bold">{{ car.brand }} {{ car.model }}</h1>
+            <h3 class="text-success mb-4">{{ car.price|intcomma }} FCFA</h3>
+
+            <ul class="list-group list-group-flush mb-4">
+                <li class="list-group-item"><strong>Année :</strong> {{ car.year }}</li>
+                <li class="list-group-item"><strong>Kilométrage :</strong> {{ car.kilometrage|intcomma }} km</li>
+                <li class="list-group-item"><strong>Ville :</strong> {{ car.ville|default:"Non précisée" }}</li> <li class="list-group-item"><strong>Statut :</strong> <span class="badge bg-success">Disponible</span></li>
+            </ul>
+
+            <h4>Description</h4>
+            <p class="text-muted">{{ car.description }}</p>
+
+            <button class="btn btn-primary btn-lg w-100 mt-3">📞 Contacter le vendeur</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
