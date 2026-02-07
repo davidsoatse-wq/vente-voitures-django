@@ -15,7 +15,7 @@
         </style>
         <div class="card h-100 shadow border-0">
             {% if car.image %}
-                <img src="{{ car.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ car.brand }}">
+              <img src="{{ car.image.url }}" alt="{{ car.brand }} {{ car.model }}" style="width:100%;">
             {% else %}
                 <img src="https://via.placeholder.com/400x250?text=Image+non+disponible" class="card-img-top">
             {% endif %}

@@ -5,8 +5,9 @@ from . import views
 urlpatterns = [
     path('', views.home, name='home'),
     path('voiture/<int:pk>/', views.car_detail, name='car_detail'),
-    # Remplace ta ligne login par celle-ci :
-    path('login/', auth_views.LoginView.as_view(template_name='inventory/login.html'), name='login'),
-    # Ajoute aussi la déconnexion pour que le bouton fonctionne :
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+
+    # On utilise TES vues personnalisées pour garder le contrôle
+    path('login/', views.login_view, name='login'),
+    path('register/', views.register_view, name='register'),
+    path('logout/', views.logout_view, name='logout'),
 ]

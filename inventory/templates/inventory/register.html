@@ -1,0 +1,78 @@
+{% extends "inventory/base.html" %}
+
+{% block content %}
+<style>
+    .register-container {
+        min-height: 85vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    .register-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 40px;
+        width: 100%;
+        max-width: 500px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        color: #333;
+    }
+    /* Styliser les inputs de Django */
+    .register-card input {
+        width: 100%;
+        border-radius: 8px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        margin-bottom: 5px;
+        display: block;
+    }
+    .helptext {
+        font-size: 0.7rem;
+        color: #777;
+        display: block;
+        margin-bottom: 15px;
+    }
+    .btn-register {
+        background: #28a745;
+        border: none;
+        border-radius: 10px;
+        padding: 12px;
+        font-weight: 600;
+        width: 100%;
+        color: white;
+        text-transform: uppercase;
+        margin-top: 10px;
+    }
+</style>
+
+<div class="register-container">
+    <div class="register-card">
+        <h2 class="text-center fw-bold mb-4">CRÉER UN COMPTE</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% for field in form %}
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">{{ field.label|upper }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small class="helptext">{{ field.help_text|safe }}</small>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <div class="text-danger small fw-bold">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-register shadow">S'inscrire</button>
+        </form>
+
+        <div class="mt-4 text-center border-top pt-3">
+            <p class="mb-1 small">Déjà inscrit ?</p>
+            <a href="{% url 'login' %}" class="fw-bold text-primary text-decoration-none">SE CONNECTER</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
