@@ -1,13 +1,16 @@
-from django.shortcuts import render , get_object_or_404 #django affiche 404 au lieu de planter
-from .models import Car
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
+from datetime import datetime
 from .models import Car
-from .forms import InscriptionForm  # Le formulaire qu'on a créé ensemble
-
+from .forms import InscriptionForm , AppointmentForm
+# --- METTRE A JOUR L'Année ---
+def home(request):
+    return render(request, "inventory/home.html", {
+        "year": datetime.now().year
+    })
 # --- ACCUEIL ---
 def home(request):
     cars = Car.objects.filter(status='Disponible').order_by('-created_at')
@@ -51,3 +54,25 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('home')
+
+def car_list(request):
+    cars = Car.objects.all()
+    return render(request, 'inventory/car_list.html', {'cars': cars})
+
+
+@login_required
+def appointment_create(request, car_id):
+    car = get_object_or_404(Car, id=car_id)
+    if request.method == 'POST':
+        form = AppointmentForm(request.POST)
+        if form.is_valid():
+            appointment = form.save(commit=False)
+            appointment.user = request.user
+            appointment.car = car
+            appointment.save()
+            messages.success(request, "Votre demande de rendez-vous a été envoyée !")
+            return redirect('car_detail', pk=car.id)
+    else:
+        form = AppointmentForm()
+
+    return render(request, 'inventory/appointment_form.html', {'form': form, 'car': car})

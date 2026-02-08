@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 
 class Car(models.Model): # Options pour les menus deroulants
     CARBURANT_CHOICES = [
@@ -34,3 +34,17 @@ class Car(models.Model): # Options pour les menus deroulants
 
     def __str__(self):
         return f"{self.brand} {self.model} ({self.year}) - {self.price} FCFA"
+
+
+class Appointment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    car = models.ForeignKey(Car, on_delete=models.CASCADE)
+    phone = models.CharField(max_length=20, verbose_name="Téléphone")
+    email = models.EmailField(verbose_name="Email")
+    date_rdv = models.DateTimeField(verbose_name="Date et Heure")
+    message = models.TextField(blank=True, verbose_name="Message")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"RDV de {self.user.username} pour {self.car.brand}"
+

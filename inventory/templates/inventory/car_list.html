@@ -1,11 +1,10 @@
 {% extends "inventory/base.html" %}
-{% load humanize %}
-
-{% block content %}
+{% load humanize %} {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="fw-bold">Nos véhicules disponibles</h1>
 </div>
 
+<!-- STYLE FAVORIS (UNE SEULE FOIS) -->
 <style>
     .card {
         border-radius: 20px;
@@ -78,11 +77,11 @@
                 <div class="mb-3">
                     <span class="badge bg-light text-dark border">📅 {{ car.year }}</span>
                     <span class="badge bg-light text-dark border">
-                        🛣 {{ car.kilometrage|intcomma }} km
+                        🛣️ {{ car.kilometrage|intcomma }} km
                     </span>
                 </div>
 
-                <div class="price-tag mb-3 fw-bold">
+                <div class="price-tag mb-3">
                     {{ car.price|intcomma }} FCFA
                 </div>
 

@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prendre rendez-vous - {{ car.brand }}</title>
+       <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .card { border-radius: 15px; }
+        .btn-primary { border-radius: 10px; padding: 12px; }
+        .login-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(
+        90deg,
+        #007aff,
+        #4da3ff,
+        #007aff
+    );
+    </style>
+</head>
+<body>
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 login-card">
+                <div class="card-body p-4">
+                    <h2 class="fw-bold text-center mb-4">📅 Prendre un rendez-vous</h2>
+
+                    <div class="alert alert-info text-center small mb-4">
+                        Vous demandez un rendez-vous pour la : <br>
+                        <strong>{{ car.brand }} {{ car.model }} ({{ car.year }})</strong>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Votre numéro de téléphone</label>
+                            {{ form.phone }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Votre adresse email</label>
+                            {{ form.email }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Date et Heure souhaitées</label>
+                            {{ form.date_rdv }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Message ou questions (Optionnel)</label>
+                            {{ form.message }}
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg shadow">
+                                Confirmer la demande
+                            </button>
+                            <a href="{% url 'car_detail' car.id %}" class="btn btn-light">
+                                Annuler et retourner aux détails
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
