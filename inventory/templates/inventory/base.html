@@ -134,7 +134,6 @@ body {
 /* --- NAVBAR --- */
 .navbar {
     background: #000 !important;
-    border-bottom: 2px solid var(--blue-electric);
     padding: 15px 0;
 }
 
@@ -294,11 +293,12 @@ body {
         <div class="d-flex align-items-center gap-3">
 
             <!-- VIP -->
-            <div class="vip-container">
-                <i class="bi bi-gem vip-icon"></i>          <!-- VIP luxe -->
-                <span class="vip-text">VIP</span>
-            </div>
-
+                <div class="vip-container">
+                    <a href="{% url 'vip_cars' %}" class="text-decoration-none">
+                        <i class="bi bi-gem vip-icon"></i>
+                    <span class="vip-text">VIP</span>
+                    </a>
+                </div>
             {% if user.is_authenticated %}
                 <span class="text-light small me-2">Salut, {{ user.username }}</span>
                 <form action="{% url 'logout' %}" method="post">
@@ -342,6 +342,7 @@ body {
             <div class="col-md-4 mb-4">
                 <h5 class="footer-title">Liens rapides</h5>
                 <ul class="footer-links">
+                    <li><a class="nav-link fw-bold text-warning" href="{% url 'vip_cars' %}">⭐ Zone VIP</a> </li>
                     <li><a href="{% url 'home' %}">Accueil</a></li>
                     <li><a href="{% url 'car_list' %}">Véhicules</a></li>
                     <li><a href="#">À propos</a></li>

@@ -11,5 +11,6 @@ urlpatterns = [
     path('register/', views.register_view, name='register'),
     path('logout/', views.logout_view, name='logout'),
     path('nos-vehicules/', views.car_list, name='car_list'), # Ajoute cette ligne
+    path('vip/', views.vip_cars, name='vip_cars'),
     path('rendez-vous/<int:car_id>/', views.appointment_create, name='appointment_create'),
 ]

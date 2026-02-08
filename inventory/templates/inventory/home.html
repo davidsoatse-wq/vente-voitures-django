@@ -50,7 +50,17 @@
         font-weight: 100;
     }
 </style>
-
+<div class="search-bar mb-4">
+    <form method="GET" action="{% url 'home' %}">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control"
+                   placeholder="Marque,Modèle, ville..."
+                   value="{{ query|default:'' }}">
+            <button class="btn btn-primary" type="submit">Rechercher</button>
+            <a href="{% url 'home' %}" class="btn btn-outline-secondary">Réinitialiser</a>
+        </div>
+    </form>
+</div>
 <div class="row">
     {% for car in cars %}
     <div class="col-md-4 mb-4">

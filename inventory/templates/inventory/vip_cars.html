@@ -1,0 +1,239 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<style>
+    /* --- VARIABLES COULEURS (Mode Clair par défaut) --- */
+    :root {
+        --bg-body: #f4f4f4;
+        --text-color: #333;
+        --card-bg: #ffffff;
+        --card-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        --accent-color: #d4af37; /* Or */
+        --beam-opacity: 0; /* Pas de phares en mode jour */
+    }
+
+    /* --- MODE SOMBRE (Dark Mode) --- */
+    body.dark-mode {
+        --bg-body: #0a0a0a;
+        --text-color: #f0f0f0;
+        --card-bg: #1a1a1a;
+        --card-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        --beam-opacity: 1; /* Phares allumés */
+    }
+
+    body {
+        background-color: var(--bg-body);
+        color: var(--text-color);
+        transition: background-color 0.5s ease, color 0.5s ease;
+        overflow-x: hidden;
+    }
+
+    /* --- 1. SLIDER 3D ROTATIF (VITESSE RAPIDE) --- */
+    .banner-3d {
+        width: 100%;
+        height: 80vh; /* Un peu moins haut pour voir le stock */
+        text-align: center;
+        overflow: hidden;
+        position: relative;
+        background: radial-gradient(circle at center, #2f2f2f, #000); /* Toujours sombre pour le contraste 3D */
+        border-bottom: 4px solid var(--accent-color);
+    }
+
+    .banner-3d .slider {
+        position: absolute;
+        width: 200px;
+        height: 250px;
+        top: 20%;
+        left: calc(50% - 100px);
+        transform-style: preserve-3d;
+        transform: perspective(1000px);
+        /* VITESSE ICI : 10s au lieu de 25s */
+        animation: autoRun 10s linear infinite;
+        z-index: 2;
+    }
+
+    @keyframes autoRun {
+        from { transform: perspective(1000px) rotateY(0deg); }
+        to { transform: perspective(1000px) rotateY(360deg); }
+    }
+
+    .banner-3d .slider .item {
+        position: absolute;
+        inset: 0;
+        transform:
+            rotateY(calc( (var(--position) - 1) * (360 / var(--quantity)) * 1deg))
+            translateZ(550px);
+    }
+
+    .banner-3d .slider .item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+    }
+
+    /* --- 2. STOCK DE VOITURES (GRID) --- */
+    .stock-section {
+        padding: 50px 0;
+    }
+
+    .vip-card {
+        background-color: var(--card-bg);
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: var(--card-shadow);
+        position: relative;
+    }
+
+    .vip-card:hover {
+        transform: translateY(-10px);
+    }
+
+    /* Image Container pour effet de phares */
+    .img-container {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .vip-card img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        transition: filter 0.5s ease;
+    }
+
+    /* --- EFFET PHARES / LUMIÈRE (Activé en Dark Mode) --- */
+    /* Lueur autour de la voiture (Drop Shadow intense) */
+    body.dark-mode .vip-card img {
+        filter: brightness(1.1) drop-shadow(0 0 15px rgba(255, 255, 255, 0.4));
+    }
+
+    /* Simulation faisceaux lumineux (Beams) */
+    .headlight-beam {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to top, rgba(255, 255, 200, 0.2) 0%, transparent 40%);
+        opacity: var(--beam-opacity);
+        transition: opacity 0.5s ease;
+        pointer-events: none;
+        z-index: 2;
+        mix-blend-mode: overlay;
+    }
+
+    /* Petit effet "Néon" sous la carte en mode nuit */
+    body.dark-mode .vip-card:hover {
+        box-shadow: 0 0 30px var(--accent-color);
+    }
+
+    /* --- BOUTON TOGGLE MODE --- */
+    .theme-toggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        background: var(--accent-color);
+        border: none;
+        color: #000;
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .card-title { color: var(--text-color); }
+    .card-text { color: var(--text-color); opacity: 0.8; }
+
+</style>
+    <a href="javascript:history.back()" class="btn btn-outline-secondary mb-4">
+        ← Retour
+    </a>
+
+<button class="theme-toggle" onclick="toggleTheme()">🌙 Mode Nuit</button>
+
+<div class="banner-3d">
+    <div class="slider" style="--quantity: {{ cars|length }}">
+        {% for car in cars %}
+            <div class="item" style="--position: {{ forloop.counter }}">
+                {% if car.image %}
+                    <img src="{{ car.image.url }}" alt="{{ car.model }}">
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <div style="position: absolute; bottom: 50px; width: 100%; z-index: 10; color: white;">
+        <h1 style="font-size: 5rem; text-shadow: 0 0 20px black; font-family: sans-serif; font-weight: 900;">VIP COLLECTION</h1>
+    </div>
+</div>
+
+<div class="container stock-section">
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h2 class="fw-bold" style="color: var(--accent-color);">NOTRE GARAGE EXCLUSIF</h2>
+            <p class="lead">Passez en mode nuit pour allumer les moteurs.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for car in cars %}
+        <div class="col-md-4 mb-4">
+            <div class="vip-card">
+                <div class="img-container">
+                    {% if car.image %}
+                        <img src="{{ car.image.url }}" alt="{{ car.brand }}">
+                        <div class="headlight-beam"></div>
+                    {% endif %}
+                </div>
+
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">{{ car.brand }} {{ car.model }}</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-warning text-dark">{{ car.year }}</span>
+                        <span class="h5 mb-0 text-warning">{{ car.price|intcomma }} FCFA</span>
+                    </div>
+                    <p class="card-text small">{{ car.description|truncatewords:15 }}</p>
+                    <a href="{% url 'car_detail' car.id %}" class="btn btn-outline-warning w-100">Voir Détails</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    // Script pour gérer le mode Nuit / Jour
+    function toggleTheme() {
+        const body = document.body;
+        const btn = document.querySelector('.theme-toggle');
+
+        body.classList.toggle('dark-mode');
+
+        if (body.classList.contains('dark-mode')) {
+            btn.innerHTML = "☀️ Mode Jour";
+            localStorage.setItem('theme', 'dark');
+        } else {
+            btn.innerHTML = "🌙 Mode Nuit";
+            localStorage.setItem('theme', 'light');
+        }
+    }
+
+    // Vérifier la préférence sauvegardée au chargement
+    window.onload = function() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.querySelector('.theme-toggle').innerHTML = "☀️ Mode Jour";
+        }
+    }
+</script>
+
+{% endblock %}

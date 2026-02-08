@@ -6,6 +6,8 @@ from django.contrib import messages
 from datetime import datetime
 from .models import Car
 from .forms import InscriptionForm , AppointmentForm
+from django.db.models import Q
+
 # --- METTRE A JOUR L'Année ---
 def home(request):
     return render(request, "inventory/home.html", {
@@ -13,9 +15,26 @@ def home(request):
     })
 # --- ACCUEIL ---
 def home(request):
-    cars = Car.objects.filter(status='Disponible').order_by('-created_at')
-    return render(request, 'inventory/home.html', {'cars': cars})
+    # On récupère le texte de la barre de recherche
+    query = request.GET.get('q')
 
+    # ÉTAPE 1 : On commence par charger toutes les voitures (comportement par défaut)
+    cars = Car.objects.filter(status='Disponible').order_by('-created_at')
+
+    # ÉTAPE 2 : Si l'utilisateur a tapé quelque chose, on affine la liste
+    if query:
+        cars = cars.filter(
+            Q(brand__icontains=query) |
+            Q(model__icontains=query) |
+            Q(city__icontains=query)
+        )
+
+    # ÉTAPE 3 : On affiche les voitures (soit toutes, soit filtrées)
+    return render(request, 'inventory/home.html', {
+        'cars': cars,
+        'year': datetime.now().year,
+        'query': query
+    })
 # --- DÉTAILS VOITURE ---
 def car_detail(request, pk):
     car = get_object_or_404(Car, pk=pk)
@@ -76,3 +95,15 @@ def appointment_create(request, car_id):
         form = AppointmentForm()
 
     return render(request, 'inventory/appointment_form.html', {'form': form, 'car': car})
+
+
+@login_required
+def vip_cars(request):
+    # On définit ce qu'est une voiture VIP (ex: prix > 20 millions ou statut spécial)
+    # Ici, on filtre les voitures dont le prix est supérieur à 20 000 000 FCFA
+    cars_vip = Car.objects.filter(price__gte=20000000, status='Disponible').order_by('-price')
+
+    return render(request, 'inventory/vip_cars.html', {
+        'cars': cars_vip,
+        'year': datetime.now().year
+    })
