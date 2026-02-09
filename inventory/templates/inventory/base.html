@@ -34,9 +34,13 @@ body {
     inset: 0;
     background: var(--bg-black);
     z-index: 10000;
-    display: flex;
+    display: none; /* CACHÉ PAR DÉFAUT */
     justify-content: center;
     align-items: center;
+}
+
+#luxury-intro.active {
+    display: flex;
     animation: dissolve 0.8s forwards 5s;
 }
 
@@ -120,9 +124,9 @@ body {
     min-height: 100vh;
     opacity : 1;
 }
+
 /* On n'applique le noir et l'attente que sur l'ACCUEIL */
-/* Pour cela, on utilise une classe spécifique */
-.is-home #site-wrapper {
+body.is-home.show-intro #site-wrapper {
     opacity: 0;
     animation: fadeInSite 1s forwards 5.2s;
 }
@@ -266,11 +270,12 @@ body {
 .footer-links a {
     color: #bbb;
     text-decoration: none;
-
+}
 </style>
 </head>
 <body class="{% if request.path == '/' %}is-home{% endif %}">
-{% if request.path == "/" %}
+
+    <!-- INTRO (toujours présent dans le HTML mais caché) -->
     <div id="luxury-intro">
         <div class="scene">
             <div class="brand-load">AUTOVENTE</div>
@@ -278,7 +283,7 @@ body {
             <img src="{% static 'images/entrer.png' %}" class="car-silhouette" alt="Voiture de luxe">
         </div>
     </div>
-{% endif %}
+
    <div id="site-wrapper">
 <nav class="navbar navbar-dark py-3">
     <div class="container d-flex justify-content-between align-items-center">
@@ -299,19 +304,26 @@ body {
                     <span class="vip-text">VIP</span>
                     </a>
                 </div>
-            {% if user.is_authenticated %}
-                <span class="text-light small me-2">Salut, {{ user.username }}</span>
-                <form action="{% url 'logout' %}" method="post">
-                    {% csrf_token %}
-                    <button class="btn btn-outline-danger btn-sm rounded-pill">
-                        Déconnexion
-                    </button>
-                </form>
-            {% else %}
-                <a href="{% url 'login' %}" class="btn btn-outline-primary rounded-pill px-4">
-                    <i class="bi bi-person-circle me-2"></i> Connexion
-                </a>
-            {% endif %}
+    {% if user.is_authenticated %}
+    <span class="text-light small me-2">Salut, {{ user.username }}</span>
+
+    {% if user.is_staff %}
+        <a href="/admin/" class="btn btn-outline-warning btn-sm rounded-pill me-2">
+            <i class="bi bi-gear-fill"></i> Admin
+        </a>
+    {% endif %}
+
+    <form action="{% url 'logout' %}" method="post" class="d-inline">
+        {% csrf_token %}
+        <button class="btn btn-outline-danger btn-sm rounded-pill">
+            Déconnexion
+        </button>
+    </form>
+{% else %}
+    <a href="{% url 'login' %}" class="btn btn-outline-primary rounded-pill px-4">
+        <i class="bi bi-person-circle me-2"></i> Connexion
+    </a>
+{% endif %}
 
         </div>
     </div>
@@ -323,6 +335,28 @@ body {
             {% endblock %}
         </div>
     </div>
+
+<!-- SCRIPT POUR CONTRÔLER L'INTRO -->
+<script>
+    // Vérifier si on est sur la page d'accueil
+    const isHomePage = document.body.classList.contains('is-home');
+
+    if (isHomePage) {
+        // Vérifier si l'intro a déjà été vue
+        const introSeen = localStorage.getItem('introSeen');
+
+        if (!introSeen) {
+            // Première visite : afficher l'intro
+            document.body.classList.add('show-intro');
+            document.getElementById('luxury-intro').classList.add('active');
+
+            // Marquer l'intro comme vue après l'animation
+            setTimeout(() => {
+                localStorage.setItem('introSeen', 'true');
+            }, 6000);
+        }
+    }
+</script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <footer class="footer mt-5">

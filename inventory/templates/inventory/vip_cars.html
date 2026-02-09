@@ -33,23 +33,22 @@
     /* --- 1. SLIDER 3D ROTATIF (VITESSE RAPIDE) --- */
     .banner-3d {
         width: 100%;
-        height: 80vh; /* Un peu moins haut pour voir le stock */
+        height: 80vh;
         text-align: center;
         overflow: hidden;
         position: relative;
-        background: radial-gradient(circle at center, #2f2f2f, #000); /* Toujours sombre pour le contraste 3D */
+        background: radial-gradient(circle at center, #2f2f2f, #000);
         border-bottom: 4px solid var(--accent-color);
     }
 
     .banner-3d .slider {
         position: absolute;
-        width: 200px;
-        height: 250px;
-        top: 20%;
-        left: calc(50% - 100px);
+        width: 350px;
+        height: 220px;
+        top: 25%;
+        left: calc(50% - 175px);
         transform-style: preserve-3d;
         transform: perspective(1000px);
-        /* VITESSE ICI : 10s au lieu de 25s */
         animation: autoRun 10s linear infinite;
         z-index: 2;
     }
@@ -64,15 +63,16 @@
         inset: 0;
         transform:
             rotateY(calc( (var(--position) - 1) * (360 / var(--quantity)) * 1deg))
-            translateZ(550px);
+            translateZ(450px);
     }
 
     .banner-3d .slider .item img {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: contain;
         border-radius: 10px;
         box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        background: transparent;
     }
 
     /* --- 2. STOCK DE VOITURES (GRID) --- */
@@ -170,8 +170,8 @@
         {% endfor %}
     </div>
 
-    <div style="position: absolute; bottom: 50px; width: 100%; z-index: 10; color: white;">
-        <h1 style="font-size: 5rem; text-shadow: 0 0 20px black; font-family: sans-serif; font-weight: 900;">VIP COLLECTION</h1>
+    <div style="position: absolute; top: 70%; width: 100%; z-index: 10; text-align: center;">
+       <h1 class="vip-title-main">VIP COLLECTION</h1>
     </div>
 </div>
 
