@@ -4,24 +4,16 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from datetime import datetime
-from .models import Car
-from .forms import InscriptionForm , AppointmentForm
+from .models import Car, Favorite  # <-- N'oublie pas d'ajouter Favorite ici
+from .forms import InscriptionForm, AppointmentForm
 from django.db.models import Q
 
-# --- METTRE A JOUR L'Année ---
-def home(request):
-    return render(request, "inventory/home.html", {
-        "year": datetime.now().year
-    })
+
 # --- ACCUEIL ---
 def home(request):
-    # On récupère le texte de la barre de recherche
     query = request.GET.get('q')
-
-    # ÉTAPE 1 : On commence par charger toutes les voitures (comportement par défaut)
     cars = Car.objects.filter(status='Disponible').order_by('-created_at')
 
-    # ÉTAPE 2 : Si l'utilisateur a tapé quelque chose, on affine la liste
     if query:
         cars = cars.filter(
             Q(brand__icontains=query) |
@@ -29,18 +21,54 @@ def home(request):
             Q(city__icontains=query)
         )
 
-    # ÉTAPE 3 : On affiche les voitures (soit toutes, soit filtrées)
+    # On récupère les IDs des voitures aimées par l'utilisateur connecté
+    user_favorites = []
+    if request.user.is_authenticated:
+        user_favorites = Favorite.objects.filter(user=request.user).values_list('car_id', flat=True)
+
     return render(request, 'inventory/home.html', {
         'cars': cars,
         'year': datetime.now().year,
-        'query': query
+        'query': query,
+        'user_favorites': user_favorites  # <-- On envoie ça au template
     })
+
+
+# --- GESTION DES FAVORIS (Ajouter/Retirer) ---
+@login_required
+def toggle_favorite(request, car_id):
+    car = get_object_or_404(Car, id=car_id)
+    # Si le favori existe, on le supprime, sinon on le crée
+    favorite, created = Favorite.objects.get_or_create(user=request.user, car=car)
+
+    if not created:
+        favorite.delete()
+        messages.info(request, f"{car.brand} retirée des favoris.")
+    else:
+        messages.success(request, f"{car.brand} ajoutée aux favoris !")
+
+    # On redirige vers la page où l'utilisateur était
+    return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+
+# --- PAGE DES FAVORIS ---
+@login_required
+def favorite_list(request):
+    # On récupère tous les objets favoris de l'utilisateur
+    my_favorites = Favorite.objects.filter(user=request.user).select_related('car')
+    return render(request, 'inventory/favorites.html', {
+        'favorites': my_favorites,
+        'year': datetime.now().year
+    })
+
+
 # --- DÉTAILS VOITURE ---
 def car_detail(request, pk):
     car = get_object_or_404(Car, pk=pk)
     return render(request, 'inventory/car_detail.html', {'car': car})
 
-# --- INSCRIPTION (Username + Password) ---
+
+# --- INSCRIPTION ---
 def register_view(request):
     if request.method == 'POST':
         form = InscriptionForm(request.POST)
@@ -51,6 +79,7 @@ def register_view(request):
     else:
         form = InscriptionForm()
     return render(request, 'inventory/register.html', {'form': form})
+
 
 # --- CONNEXION ---
 def login_view(request):
@@ -69,16 +98,14 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, 'inventory/login.html', {'form': form})
 
+
 # --- DÉCONNEXION ---
 def logout_view(request):
     logout(request)
     return redirect('home')
 
-def car_list(request):
-    cars = Car.objects.all()
-    return render(request, 'inventory/car_list.html', {'cars': cars})
 
-
+# --- RENDEZ-VOUS ---
 @login_required
 def appointment_create(request, car_id):
     car = get_object_or_404(Car, id=car_id)
@@ -93,16 +120,13 @@ def appointment_create(request, car_id):
             return redirect('car_detail', pk=car.id)
     else:
         form = AppointmentForm()
-
     return render(request, 'inventory/appointment_form.html', {'form': form, 'car': car})
 
 
+# --- SECTION VIP ---
 @login_required
 def vip_cars(request):
-    # On définit ce qu'est une voiture VIP (ex: prix > 20 millions ou statut spécial)
-    # Ici, on filtre les voitures dont le prix est supérieur à 20 000 000 FCFA
     cars_vip = Car.objects.filter(price__gte=20000000, status='Disponible').order_by('-price')
-
     return render(request, 'inventory/vip_cars.html', {
         'cars': cars_vip,
         'year': datetime.now().year

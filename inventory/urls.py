@@ -10,7 +10,10 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('register/', views.register_view, name='register'),
     path('logout/', views.logout_view, name='logout'),
-    path('nos-vehicules/', views.car_list, name='car_list'), # Ajoute cette ligne
+    #path('nos-vehicules/', views.car_list, name='car_list'), # Ajoute cette ligne
     path('vip/', views.vip_cars, name='vip_cars'),
     path('rendez-vous/<int:car_id>/', views.appointment_create, name='appointment_create'),
+path('favorite/<int:car_id>/', views.toggle_favorite, name='toggle_favorite'),
+path('mes-favoris/', views.favorite_list, name='favorite_list'),
+
 ]
